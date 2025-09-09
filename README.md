@@ -1,2 +1,4 @@
 # Studygo
-¿Buscas clases personalizadas y profesores de calidad desde la comodidad de tu hogar? Con StudyGo puedes conectar rápidamente con docentes expertos en distintas materias y niveles educativos.
+¡La forma más fácil y rápida de encontrar profesores en línea!
+Conecta con expertos en distintas materias, agenda tus clases y aprende desde donde quieras.
+¡Empieza a estudiar con los mejores hoy mismo!
