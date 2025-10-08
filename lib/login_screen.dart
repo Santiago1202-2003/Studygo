@@ -150,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              // Campo de Contraseña
               TextField(
                 controller: passwordController,
                 obscureText: true,
@@ -187,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 25),
 
-              // Texto divisor
+
               const Row(
                 children: [
                   Expanded(child: Divider(thickness: 1)),

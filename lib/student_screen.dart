@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'teacher_profile_screen.dart'; // 👈 Asegúrate de tener esta pantalla creada
 
 class StudentScreen extends StatefulWidget {
   const StudentScreen({Key? key}) : super(key: key);
@@ -10,13 +12,15 @@ class StudentScreen extends StatefulWidget {
 
 class _StudentScreenState extends State<StudentScreen> {
   String searchQuery = "";
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Fondo con imagen
+          // 🖼️ Fondo
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -45,7 +49,7 @@ class _StudentScreenState extends State<StudentScreen> {
                         });
                       },
                       decoration: const InputDecoration(
-                        hintText: "Buscar",
+                        hintText: "Buscar profesor o materia",
                         prefixIcon: Icon(Icons.search, color: Colors.deepPurple),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 14),
@@ -54,39 +58,42 @@ class _StudentScreenState extends State<StudentScreen> {
                   ),
                 ),
 
-                // 📌 Lista de profesores
+                // 📘 Lista de profesores
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance.collection('teachers').snapshots(),
+                    stream: FirebaseFirestore.instance
+                        .collection('teachers')
+                        .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return const Center(child: Text("No hay profesores disponibles"));
+                        return const Center(
+                          child: Text("No hay profesores disponibles"),
+                        );
                       }
 
                       var teachers = snapshot.data!.docs.where((doc) {
                         var nombre = doc['nombre'].toString().toLowerCase();
                         var materia = doc['materia'].toString().toLowerCase();
-                        return nombre.contains(searchQuery) || materia.contains(searchQuery);
+                        return nombre.contains(searchQuery) ||
+                            materia.contains(searchQuery);
                       }).toList();
 
                       if (teachers.isEmpty) {
-                        return const Center(child: Text("No se encontraron resultados"));
+                        return const Center(
+                          child: Text("No se encontraron resultados"),
+                        );
                       }
 
                       return ListView.builder(
                         itemCount: teachers.length,
                         itemBuilder: (context, index) {
-                          var teacher = teachers[index];
-                          return _buildTeacherCard(
-                            teacher['nombre'],
-                            teacher['materia'],
-                            teacher['precio'],
-                            teacher['rating'],
-                            teacher['photoUrl'],
-                          );
+                          var teacher =
+                          teachers[index].data() as Map<String, dynamic>;
+                          teacher['uid'] = teachers[index].id;
+                          return _buildTeacherCard(teacher);
                         },
                       );
                     },
@@ -100,8 +107,8 @@ class _StudentScreenState extends State<StudentScreen> {
     );
   }
 
-  // 🔹 Card de profesor
-  Widget _buildTeacherCard(String nombre, String materia, int precio, int rating, String photoUrl) {
+  // 🧑‍🏫 Tarjeta del profesor
+  Widget _buildTeacherCard(Map<String, dynamic> teacher) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -110,51 +117,70 @@ class _StudentScreenState extends State<StudentScreen> {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            // Foto
             CircleAvatar(
               radius: 30,
-              backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-              child: photoUrl.isEmpty ? const Icon(Icons.person, size: 40) : null,
+              backgroundColor: Colors.deepPurple.shade100,
+              child:
+              const Icon(Icons.person, size: 40, color: Colors.deepPurple),
             ),
             const SizedBox(width: 12),
-
-            // Datos profesor
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(nombre,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.deepPurple)),
-                  Text(materia, style: const TextStyle(fontSize: 14)),
+                  Text(
+                    teacher["nombre"] ?? "Profesor",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                  Text(
+                    teacher["materia"] ?? "",
+                    style: const TextStyle(fontSize: 14),
+                  ),
                   const SizedBox(height: 5),
-                  Text("💲 $precio/h", style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                  Row(
-                    children: List.generate(5, (index) {
-                      return Icon(
-                        index < rating ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 20,
-                      );
-                    }),
+                  Text(
+                    "💲 ${teacher["precio"] ?? 0}/h",
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Botón reservar
+            // 🔘 Nuevo botón que abre el perfil del profesor
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              onPressed: () {},
-              child: const Text("Reservar", style: TextStyle(color: Colors.white)),
-            )
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TeacherProfileScreen(
+                      teacherId: teacher['uid'],
+                    ),
+                  ),
+                );
+              },
+              child: const Text(
+                "Reservar",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
 
 
