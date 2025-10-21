@@ -1,16 +1,5 @@
-# tutores_app
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Studygo
+¡La forma más fácil y rápida de encontrar profesores en línea!
+Conecta con expertos en distintas materias, agenda tus clases y aprende desde donde quieras.
+¡Empieza a estudiar con los mejores hoy mismo!
+>>>>>>> 4149e2662fd518f88204785cdf6b4d4a06b67ece
