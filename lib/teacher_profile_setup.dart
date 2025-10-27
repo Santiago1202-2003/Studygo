@@ -16,7 +16,7 @@ class _TeacherProfileSetupState extends State<TeacherProfileSetup> {
   String name = '';
   String subject = '';
   String bio = '';
-  String photoUrl = ''; // luego puedes poner picker de imágenes
+  String photoUrl = '';
 
   @override
   Widget build(BuildContext context) {
